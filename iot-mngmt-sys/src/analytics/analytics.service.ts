@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAnalyticsDto } from './dto/create-analytics.dto';
 import { UpdateAnalyticsDto } from './dto/update-analytics.dto';
+import { GetAnalyticsDto } from './dto/get-analytics.dto';
+import { InfluxService } from './influx/influx.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AnalyticsService {
-  create(createAnalyticsDto: CreateAnalyticsDto) {
-    return 'This action adds a new analytics';
+  constructor(
+    private readonly influxService: InfluxService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
+
+  sendLiveUpdate(
+    deviceId: string,
+    appliance: string,
+    data: { [key: string]: any },
+  ) {
+    //emit event for live update back to the websocket gateway
+    this.eventEmitter.emit('telemetry.received', {
+      deviceId: deviceId,
+      appliance: appliance,
+      data: data,
+    });
+    return true;
   }
 
-  findAll() {
-    return `This action returns all analytics`;
+  async create(createAnalyticsDto: CreateAnalyticsDto) {
+    return await this.influxService.writeMetrics(createAnalyticsDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} analytics`;
-  }
-
-  update(id: number, updateAnalyticsDto: UpdateAnalyticsDto) {
-    return `This action updates a #${id} analytics`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} analytics`;
+  async get(data: GetAnalyticsDto) {
+    return await this.influxService.queryMetrics(data);
   }
 }

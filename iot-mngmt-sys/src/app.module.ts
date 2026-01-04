@@ -7,6 +7,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { ControlModule } from './control/control.module';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     MqttModule,
     ControlModule,
     ConfigModule.forRoot({ isGlobal: true }), //injects environment variables
+    EventEmitterModule.forRoot({}), // enables event-driven architecture
   ],
   controllers: [AppController],
   providers: [AppService],

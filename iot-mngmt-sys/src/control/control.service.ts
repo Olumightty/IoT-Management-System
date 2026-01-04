@@ -1,36 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateControlDto } from './dto/create-control.dto';
-import { UpdateControlDto } from './dto/update-control.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { MqttService } from 'src/mqtt/mqtt.service';
 
 @Injectable()
 export class ControlService {
   constructor(
     //Inject the MQTT service from the mqtt module
-    @Inject('MQTT_CLIENT')
-    private readonly mqttClient: ClientProxy,
+    private readonly mqttService: MqttService,
   ) {}
 
   // async onModuleInit() {
   //   await this.mqttClient.connect();
   // }
-  create(createControlDto: CreateControlDto) {
-    return 'This action adds a new control';
-  }
-
-  findAll() {
-    return `This action returns all control`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} control`;
-  }
-
-  update(id: number, updateControlDto: UpdateControlDto) {
-    return `This action updates a #${id} control`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} control`;
+  giveCommand(createControlDto: CreateControlDto) {
+    return this.mqttService.publishCommand(
+      createControlDto.deviceId,
+      createControlDto.appliance,
+      { state: createControlDto.command },
+    );
   }
 }

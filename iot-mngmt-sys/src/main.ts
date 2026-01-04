@@ -11,7 +11,13 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.MQTT,
     options: {
-      url: process.env.MQTT_URL,
+      host: process.env.MQTT_HOST,
+      port: +process.env.MQTT_PORT!,
+      clientId: process.env.MQTT_CLIENT_ID,
+      protocolVersion: 5,
+      subscribeOptions: {
+        qos: 0,
+      },
     },
   });
   const config = new DocumentBuilder()
@@ -24,6 +30,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

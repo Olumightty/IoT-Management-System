@@ -31,6 +31,9 @@ export class IoTDevice {
   @Column()
   user_id: string;
 
+  @Column({ nullable: true })
+  security_token: string;
+
   // Note: OneToMany is a 'virtual' side for TypeORM.
   // The DB constraint is actually handled in the Appliance entity.
   @OneToMany(() => Appliance, (appliance) => appliance.iot_device)

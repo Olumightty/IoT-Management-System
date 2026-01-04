@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/repositories/user/user.module';
 import { ConfigService } from '@nestjs/config';
+import { IoTDeviceModule } from 'src/repositories/iotdevice/iotdevice.module';
 
 @Global()
 @Module({
@@ -23,7 +24,7 @@ import { ConfigService } from '@nestjs/config';
 class GlobalJwtModule {}
 
 @Module({
-  imports: [GlobalJwtModule, UserModule],
+  imports: [GlobalJwtModule, UserModule, IoTDeviceModule],
   controllers: [AuthController],
   providers: [AuthService],
 })

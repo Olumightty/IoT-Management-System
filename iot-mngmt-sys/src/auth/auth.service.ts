@@ -12,12 +12,15 @@ import { UserService } from 'src/repositories/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from 'src/repositories/user/user.entity';
+import { IoTDeviceService } from 'src/repositories/iotdevice/iotdevice.service';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly JWTService: JwtService,
+    private readonly iotdeviceService: IoTDeviceService,
   ) {}
   async create(createAuthDto: CreateAuthDto) {
     const exist = await this.userService.findByEmail(createAuthDto.email);
@@ -119,6 +122,23 @@ export class AuthService {
     const user = await this.userService.findOne(payload.sub);
     if (!user) throw new NotFoundException('User not found');
     return user;
+  }
+
+  // Generate and store a security token for an IoT device in your database for authentication to the MQTT broker
+  async generateDeviceToken(deviceId: string, userId: string) {
+    const token = randomBytes(16).toString('hex');
+    const hashedToken = await bcrypt.hash(token, 10);
+    // Store the HASHED version in your Postgres 'Device' table
+    await this.iotdeviceService.update(
+      {
+        id: deviceId,
+        user_id: userId,
+      },
+      {
+        security_token: hashedToken,
+      },
+    );
+    return token; // Return the RAW token to the user ONLY ONCE
   }
 
   remove(id: number) {

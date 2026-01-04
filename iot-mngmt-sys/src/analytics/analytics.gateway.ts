@@ -1,44 +1,81 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AnalyticsService } from './analytics.service';
+import { GetAnalyticsDto } from './dto/get-analytics.dto';
+import { UseGuards } from '@nestjs/common';
+import { WsJwtGuard } from 'src/auth/guard/ws.guard';
+import { IoTDeviceService } from 'src/repositories/iotdevice/iotdevice.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
+@UseGuards(WsJwtGuard)
 @WebSocketGateway({
   cors: { origin: '*' }, // In production, restrict this to your frontend URL
 })
 export class AnalyticsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor(
+    private readonly analyticsService: AnalyticsService,
+    private readonly iotdeviceService: IoTDeviceService,
+  ) {}
+
+  handleConnection(client: Socket) {
+    // Logic: When a user connects, join them to a 'room' based on their UserID
+    // This ensures Data Isolation (User A doesn't see User B's live data)
+    console.log('Client connected:', client.id);
+  }
 
   @WebSocketServer()
   server: Server;
 
-  async handleConnection(client: Socket) {
-    // Logic: When a user connects, join them to a 'room' based on their UserID
-    // This ensures Data Isolation (User A doesn't see User B's live data)
-    const userId = client.handshake.query.userId as string;
-    if (userId) {
-      await client.join(`user_${userId}`);
-      console.log(`User ${userId} joined their private live stream.`);
+  @OnEvent('telemetry.received')
+  handleLiveUpdate(payload: any) {
+    const { deviceId, appliance, data } = payload;
+    // Send to the specific room
+    this.server
+      .to(`device_${deviceId}:appliance_${appliance}`)
+      .emit('liveTelemetry', data);
+  }
+
+  @SubscribeMessage('query_metrics')
+  async queryMetrics(
+    @MessageBody() data: GetAnalyticsDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      // console.log('Received query_metrics:', data);
+      const userId = client.data['user'].sub as string;
+
+      const ownsDevice = await this.iotdeviceService.findOne({
+        id: data.deviceId,
+        user_id: userId,
+      });
+      if (!ownsDevice) {
+        throw new WsException('Unauthorized device access');
+      }
+      await client.join(`device_${data.deviceId}:appliance_${data.appliance}`); // Join device-specific room
+      const results = await this.analyticsService.get(data);
+
+      client.emit('metrics_response', results);
+    } catch (error) {
+      console.error('Error in queryMetrics:', error);
+      throw new WsException('Failed to fetch metrics');
     }
   }
 
   // This method will be called by your Service
-  sendLiveUpdate(userId: string, data: any) {
-    this.server.to(`user_${userId}`).emit('liveTelemetry', data);
-  }
 
-  async handleDisconnect(client: Socket) {
+  handleDisconnect(client: Socket) {
     // Logic: When a user disconnects, remove them from their 'room'
-    const userId = client.handshake.query.userId as string;
-    if (userId) {
-      await client.leave(`user_${userId}`);
-      console.log(`User ${userId} left their private live stream.`);
-    }
+    console.log('Client disconnected:', client.id);
   }
 }
