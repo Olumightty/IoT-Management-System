@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   HttpException,
   Injectable,
   NotFoundException,
@@ -23,7 +24,9 @@ export class AuthService {
     private readonly iotdeviceService: IoTDeviceService,
   ) {}
   async create(createAuthDto: CreateAuthDto) {
-    const exist = await this.userService.findByEmail(createAuthDto.email);
+    const exist = await this.userService.findOne({
+      email: createAuthDto.email,
+    });
     if (exist) throw new ConflictException('Email already exists');
     try {
       const saltOrRounds = 10;
@@ -64,10 +67,10 @@ export class AuthService {
 
   async login(email: string, password: string) {
     try {
-      const user = await this.userService.findByEmail(email);
+      const user = await this.userService.findOne({ email });
       if (!user) throw new NotFoundException('Invalid credentials');
       const isMatch = await bcrypt.compare(password, user.password_hash);
-      if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+      if (!isMatch) throw new ForbiddenException('Invalid credentials');
       const payload = { sub: user.id, role: user.role };
       const accessToken = await this.JWTService.signAsync(payload, {
         expiresIn: '15m',
@@ -95,13 +98,13 @@ export class AuthService {
       const payload = await this.JWTService.verifyAsync(refreshToken, {
         secret: process.env.JWT_SECRET,
       });
-      const user = await this.userService.findOne(payload.sub);
+      const user = await this.userService.findOne({ id: payload.sub });
       if (!user) throw new NotFoundException('Invalid credentials');
       const isMatch = await bcrypt.compare(
         refreshToken,
         user.refresh_token_hash,
       );
-      if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+      if (!isMatch) throw new ForbiddenException('Invalid credentials');
 
       const accessToken = await this.JWTService.signAsync(
         { sub: user.id, role: user.role },
@@ -118,10 +121,13 @@ export class AuthService {
     }
   }
 
-  async getUserProfile(payload: { sub: string }) {
-    const user = await this.userService.findOne(payload.sub);
+  async getUserProfile(id: string) {
+    const user = await this.userService.findOne({ id });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    return {
+      data: user,
+      message: 'User profile retrieved successfully',
+    };
   }
 
   // Generate and store a security token for an IoT device in your database for authentication to the MQTT broker
@@ -138,7 +144,10 @@ export class AuthService {
         security_token: hashedToken,
       },
     );
-    return token; // Return the RAW token to the user ONLY ONCE
+    return {
+      token,
+      message: 'Device token generated successfully',
+    }; // Return the RAW token to the user ONLY ONCE
   }
 
   remove(id: number) {

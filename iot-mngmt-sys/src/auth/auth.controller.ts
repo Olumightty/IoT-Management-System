@@ -78,7 +78,16 @@ export class AuthController {
   }
 
   @HttpCode(200)
+  @Post('generate-device-token')
+  @UseGuards(AuthGuard)
+  generateDeviceToken(@Body() body: { deviceId: string }, @Req() req: Request) {
+    return this.authService.generateDeviceToken(body.deviceId, req['user'].sub);
+  }
+
+  @HttpCode(200)
   @Get('profile')
   @UseGuards(AuthGuard)
-  getUserProfile() {}
+  getUserProfile(@Req() req: Request) {
+    return this.authService.getUserProfile(req['user'].sub);
+  }
 }

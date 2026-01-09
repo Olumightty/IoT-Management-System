@@ -18,7 +18,8 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 @UseGuards(WsJwtGuard)
 @WebSocketGateway({
-  cors: { origin: '*' }, // In production, restrict this to your frontend URL
+  cors: { origin: '*', credentials: true, methods: ['GET', 'POST'] },
+  transports: ['websocket'], // In production, restrict this to your frontend URL
 })
 export class AnalyticsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -43,7 +44,11 @@ export class AnalyticsGateway
     // Send to the specific room
     this.server
       .to(`device_${deviceId}:appliance_${appliance}`)
-      .emit('liveTelemetry', data);
+      .emit('liveTelemetry', {
+        ...data,
+        deviceId,
+        appliance,
+      });
   }
 
   @SubscribeMessage('query_metrics')
@@ -66,6 +71,7 @@ export class AnalyticsGateway
       const results = await this.analyticsService.get(data);
 
       client.emit('metrics_response', results);
+      return;
     } catch (error) {
       console.error('Error in queryMetrics:', error);
       throw new WsException('Failed to fetch metrics');

@@ -4,10 +4,11 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({ credentials: true, origin: true });
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.MQTT,
     options: {
@@ -30,6 +31,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  app.use(morgan('dev'));
   await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }

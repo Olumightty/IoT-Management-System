@@ -1,8 +1,8 @@
 import {
   ConflictException,
+  ForbiddenException,
   HttpException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
@@ -80,7 +80,7 @@ export class DevicesService {
         id: iot_device_id,
         user_id: userId,
       });
-      if (!device) throw new UnauthorizedException();
+      if (!device) throw new ForbiddenException();
       const newAppliance = await this.appliancesService.create({
         ...createApplianceDto,
         iot_device_id,
@@ -126,7 +126,7 @@ export class DevicesService {
         id,
         user_id: userId,
       });
-      if (!device) throw new UnauthorizedException();
+      if (!device) throw new ForbiddenException();
       await this.appliancesService.remove({ iot_device_id: id, label: slug });
       return {
         message: 'Appliance deleted successfully',
