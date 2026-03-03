@@ -19,6 +19,9 @@ async function bootstrap() {
       subscribeOptions: {
         qos: 0,
       },
+      username: process.env.MQTT_USERNAME,
+      password: process.env.MQTT_PASSWORD,
+      reconnectPeriod: 5000,
     },
   });
   const config = new DocumentBuilder()
@@ -32,7 +35,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.use(morgan('dev'));
-  await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.startAllMicroservices(); // Start MQTT microservice after the main app is ready for thw mqtt auth to work properly
 }
 bootstrap();

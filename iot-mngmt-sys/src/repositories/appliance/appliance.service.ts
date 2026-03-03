@@ -17,6 +17,15 @@ export class ApplianceService {
     return this.applianceRepository.findOneBy(where);
   }
 
+  async findOneWithRelations(
+    where: FindOptionsWhere<Appliance>,
+  ): Promise<Appliance | null> {
+    return this.applianceRepository.findOne({
+      where,
+      relations: ['iot_device'],
+    });
+  }
+
   async findMany(where: Partial<Appliance>): Promise<Appliance[] | null> {
     return this.applianceRepository.find({ where });
   }

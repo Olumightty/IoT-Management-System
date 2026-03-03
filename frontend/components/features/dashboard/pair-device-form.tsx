@@ -20,6 +20,7 @@ const pairSchema = z.object({
   mac_address: z
     .string()
     .regex(macRegex, "Enter a valid MAC address (e.g., AA:BB:CC:DD:EE:FF)"),
+  description: z.string().optional(),
 });
 
 type PairFormValues = z.infer<typeof pairSchema>;
@@ -42,6 +43,7 @@ export function PairDeviceForm({ onDeviceCreated }: PairDeviceFormProps) {
     defaultValues: {
       label: "",
       mac_address: "",
+      description: "",
     },
   });
 
@@ -88,6 +90,17 @@ export function PairDeviceForm({ onDeviceCreated }: PairDeviceFormProps) {
             placeholder="AA:BB:CC:DD:EE:FF"
             {...register("mac_address")}
             error={errors.mac_address?.message}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm text-slate-200" htmlFor="description">
+            Description
+          </label>
+          <Input
+            id="description"
+            placeholder="Optional device description"
+            {...register("description")}
+            error={errors.description?.message}
           />
         </div>
       </div>

@@ -4,4 +4,5 @@ export class CreateAnalyticsDto {
   voltage: number;
   current: number;
   power: number;
+  temperature?: number;
 }

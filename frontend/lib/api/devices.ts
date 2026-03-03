@@ -69,3 +69,15 @@ export async function removeAppliance(
   );
   return response.data;
 }
+
+export async function updateDevice(
+  client: AxiosInstance,
+  deviceId: string,
+  payload: Record<string, unknown>,
+): Promise<{ message?: string }> {
+  const response = await client.patch<{ message?: string }>(
+    `/devices/${deviceId}`,
+    payload,
+  );
+  return response.data;
+}

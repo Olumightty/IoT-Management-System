@@ -33,6 +33,20 @@ export class DevicesController {
     return this.devicesService.getDevices(req['user'].sub);
   }
 
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  updateDevice(
+    @Param('id') id: string,
+    @Body() updateDeviceDto: UpdateDeviceDto,
+    @Req() req: Request,
+  ) {
+    return this.devicesService.updateDevice(
+      id,
+      updateDeviceDto,
+      req['user'].sub
+    );
+  }
+
   @Delete(':id')
   @UseGuards(AuthGuard)
   removeDevice(@Param('id') id: string, @Req() req: Request) {

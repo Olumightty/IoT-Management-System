@@ -130,6 +130,12 @@ export class AuthService {
     };
   }
 
+  async updateProfile(id: string, updateAuthDto: UpdateAuthDto) {
+    const user = await this.userService.findOne({ id });
+    if (!user) throw new NotFoundException('User not found');
+    return this.userService.update(id, updateAuthDto);
+  }
+
   // Generate and store a security token for an IoT device in your database for authentication to the MQTT broker
   async generateDeviceToken(deviceId: string, userId: string) {
     const token = randomBytes(16).toString('hex');
@@ -152,5 +158,18 @@ export class AuthService {
 
   remove(id: number) {
     return `This action removes a #${id} auth`;
+  }
+
+  async validateDeviceCredentials(
+    deviceId: string,
+    rawToken: string,
+  ): Promise<boolean> {
+    // Fetch device and include the hidden secret hash
+    const device = await this.iotdeviceService.findOne({ id: deviceId });
+
+    if (!device) return false;
+
+    // Compare the raw token from MQTT with the hash in DB
+    return await bcrypt.compare(rawToken, device.security_token);
   }
 }

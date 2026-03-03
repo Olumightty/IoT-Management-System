@@ -54,6 +54,30 @@ export class DevicesService {
     }
   }
 
+  async updateDevice(
+    id: string,
+    updateDeviceDto: UpdateDeviceDto,
+    userId: string,
+  ) {
+    try {
+      const updatedDevice = await this.iotDeviceService.update(
+        { id, user_id: userId },
+        updateDeviceDto,
+      );
+      return {
+        data: updatedDevice,
+        message: 'Device updated successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { status: 500, message: 'Something went wrong' },
+        500,
+        { cause: error },
+      );
+    }
+  }
+
   async removeDevice(id: string, userId: string) {
     try {
       await this.iotDeviceService.remove({ id, user_id: userId });

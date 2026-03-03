@@ -4,6 +4,7 @@ import { getServerSession } from "@/lib/server/session";
 import { SessionHydrator } from "@/components/providers/session-hydrator";
 import { Badge } from "@/components/ui/badge";
 import { LogoutButton } from "@/components/features/auth/logout-button";
+import Link from "next/link";
 
 export default async function ProtectedLayout({ children }: PropsWithChildren) {
   const session = await getServerSession();
@@ -30,6 +31,18 @@ export default async function ProtectedLayout({ children }: PropsWithChildren) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-100 transition hover:border-emerald-300/60"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/profile"
+            className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-100 transition hover:border-emerald-300/60"
+          >
+            Profile
+          </Link>
           <Badge variant="accent">{session.profile.role}</Badge>
           <Badge variant="muted">
             Joined {new Date(session.profile.created_at).toLocaleDateString()}

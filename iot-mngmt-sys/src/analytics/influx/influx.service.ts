@@ -36,6 +36,11 @@ export class InfluxService {
         .floatField('current', data.current)
         .floatField('power', data.power);
 
+      // Only add temperature if it's provided by the device
+      if (data.temperature) {
+        point.floatField('temperature', data.temperature);
+      }
+
       this.writeApi.writePoint(point);
       await this.writeApi.flush();
 
@@ -53,7 +58,7 @@ export class InfluxService {
         |> range(start: ${new Date(data.from).toISOString()}, stop: ${new Date(data.to).toISOString()})
         |> filter(fn: (r) => r._measurement == "energy_metrics" and r.deviceId == "${data.deviceId}" and r.appliance == "${data.appliance}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> keep(columns: ["_time", "voltage", "current", "power"])`;
+        |> keep(columns: ["_time", "voltage", "current", "power", "temperature"])`;
 
       // Await for the query to complete and Execute the query and process results
       await new Promise((resolve, reject) => {

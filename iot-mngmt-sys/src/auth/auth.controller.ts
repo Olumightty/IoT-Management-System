@@ -90,4 +90,64 @@ export class AuthController {
   getUserProfile(@Req() req: Request) {
     return this.authService.getUserProfile(req['user'].sub);
   }
+
+  @HttpCode(200)
+  @Patch('profile')
+  @UseGuards(AuthGuard)
+  updateProfile(@Body() updateAuthDto: UpdateAuthDto, @Req() req: Request) {
+    return this.authService.updateProfile(req['user'].sub, updateAuthDto);
+  }
+
+  @HttpCode(200) // Mosquitto expects 200 for success, 401/403 for failure
+  @Post('mqtt/user')
+  async validateMqttUser(@Body() body: { username: string; password: string }) {
+    const { username, password } = body;
+    console.log('MQTT Auth attempt for username:', username);
+    // For the Superuser, we can allow it to bypass device credential checks
+    if(username === process.env.MQTT_USERNAME && password === process.env.MQTT_PASSWORD) {
+      return { status: 'allow' };
+    }
+
+    // 1. Username is your deviceId (UUID)
+    // 2. Password is the raw secret token sent by the device
+    const isValid = await this.authService.validateDeviceCredentials(
+      username,
+      password,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid Device Credentials');
+    }
+
+    // Return 200 OK to allow Mosquitto to accept the connection
+    return { status: 'allow' };
+  }
+
+  @Post('mqtt/superuser')
+  @HttpCode(200)
+  validateSuperuser(@Body() body: { username: string; password: string }) {
+    const { username } = body;
+
+    const isServer = username === process.env.MQTT_USERNAME;
+    console.log('Superuser check for username:', username, 'isServer:', isServer);
+    if (!isServer) {
+      throw new UnauthorizedException('Superuser Denied');
+    }
+    return { status: 'allow' };
+  }
+
+  @HttpCode(200)
+  @Post('mqtt/acl')
+  checkMqttAcl(@Body() body: { username: string; topic: string; acc: number }) {
+    const { username, topic } = body;
+    console.log('ACL check for username:', username, 'topic:', topic);
+    // Logic: Ensure the topic starts with the device's own ID
+    // Example topic: energy/dev-uuid-123/fridge/telemetry
+    if (topic.includes(username)) {
+      return { status: 'allow' };
+    }
+
+    // Deny access to topics that don't match the device ID
+    throw new UnauthorizedException('ACL Denied');
+  }
 }

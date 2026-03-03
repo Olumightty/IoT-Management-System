@@ -11,9 +11,8 @@ import { DevicePanel } from "./device-panel";
 import { PairDeviceForm } from "./pair-device-form";
 import { AppliancePanel } from "./appliance-panel";
 import { CreateApplianceForm } from "./create-appliance-form";
-import { ControlPanel } from "./control-panel";
-import { TelemetryPanel } from "./telemetry-panel";
-import { DeviceTokenCard } from "./device-token-card";
+import { DeviceCard } from "@/components/features/command-center/device-card";
+import { TokenRotationCard } from "@/components/features/command-center/token-rotation-card";
 
 interface DashboardShellProps {
   profile: UserProfile;
@@ -122,10 +121,27 @@ export function DashboardShell({
     [appliances.length],
   );
 
-  const selectedDevice = useMemo(
-    () => devices.find((device) => device.id === selectedDeviceId) ?? null,
-    [devices, selectedDeviceId],
-  );
+  const groupedDevices = useMemo(() => {
+    const groups: Record<string, Device[]> = {
+      Kitchen: [],
+      Office: [],
+      "Living Room": [],
+      General: [],
+    };
+    devices.forEach((device) => {
+      const label = device.label.toLowerCase();
+      if (label.includes("kitchen")) {
+        groups.Kitchen.push(device);
+      } else if (label.includes("office")) {
+        groups.Office.push(device);
+      } else if (label.includes("living")) {
+        groups["Living Room"].push(device);
+      } else {
+        groups.General.push(device);
+      }
+    });
+    return groups;
+  }, [devices]);
 
   return (
     <div className="space-y-6">
@@ -159,7 +175,27 @@ export function DashboardShell({
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="space-y-6">
+        {Object.entries(groupedDevices).map(([group, items]) =>
+          items.length ? (
+            <div key={group}>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-slate-50">{group}</h2>
+                <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+                  {items.length} device{items.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {items.map((device) => (
+                  <DeviceCard key={device.id} device={device} />
+                ))}
+              </div>
+            </div>
+          ) : null,
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DevicePanel
           devices={devices}
           selectedDeviceId={selectedDeviceId}
@@ -172,13 +208,9 @@ export function DashboardShell({
         >
           <PairDeviceForm onDeviceCreated={handleDeviceCreated} />
         </Card>
-        <DeviceTokenCard
-          deviceId={selectedDeviceId}
-          deviceLabel={selectedDevice?.label}
-        />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <AppliancePanel
           deviceId={selectedDeviceId}
           appliances={appliances}
@@ -204,14 +236,7 @@ export function DashboardShell({
         </Card>
       </div>
 
-      <ControlPanel
-        deviceId={selectedDeviceId}
-        appliance={selectedAppliance}
-      />
-      <TelemetryPanel
-        deviceId={selectedDeviceId}
-        appliance={selectedAppliance}
-      />
+      <TokenRotationCard deviceId={selectedDeviceId} /> */}
     </div>
   );
 }

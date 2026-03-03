@@ -40,6 +40,9 @@ export class User {
   })
   role: UserRole;
 
+  @Column({ nullable: true })
+  phone_number: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

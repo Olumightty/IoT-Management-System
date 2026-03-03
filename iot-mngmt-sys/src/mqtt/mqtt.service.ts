@@ -17,14 +17,20 @@ export class MqttService {
     data: TelemetryDataDto,
   ) {
     // Process and store telemetry data in InfluxDB
-    const exists = await this.applianceService.findOne({
+    const exists = await this.applianceService.findOneWithRelations({
       iot_device_id: deviceId,
       label: appliance,
     });
+
     if (!exists) {
       console.warn(
         `Received telemetry for unknown appliance ${appliance} on device ${deviceId}`,
       );
+      return false;
+    }
+
+    if (exists && exists.iot_device.is_muted) {
+      console.log(`Device ${deviceId} is muted. Ignoring telemetry data.`);
       return false;
     }
     await this.analyticsService.create({ ...data, deviceId, appliance });
@@ -32,6 +38,7 @@ export class MqttService {
   }
 
   publishCommand(deviceId: string, appliance: string, command: any) {
+    console.log('Publishing command:', command);
     this.client.emit(`cmnd/${deviceId}/${appliance}/state`, command);
   }
 }

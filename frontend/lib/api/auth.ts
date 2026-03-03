@@ -64,3 +64,14 @@ export async function generateDeviceToken(
   );
   return response.data;
 }
+
+export async function updateProfile(
+  client: AxiosInstance,
+  payload: Partial<UserProfile> & { phone_number?: string },
+): Promise<{ data: UserProfile; message?: string }> {
+  const response = await client.patch<{ data: UserProfile; message?: string }>(
+    "/auth/profile",
+    payload,
+  );
+  return response.data;
+}

@@ -37,7 +37,9 @@ function isLiveTelemetry(
   return (
     typeof typed.voltage === "number" &&
     typeof typed.current === "number" &&
-    typeof typed.power === "number"
+    typeof typed.power === "number" &&
+    typeof typed.deviceId === "string" &&
+    typeof typed.appliance === "string"
   );
 }
 

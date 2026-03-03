@@ -15,6 +15,7 @@ export interface UserProfile {
   last_name: string;
   email: string;
   role: string;
+  phone_number?: string | null;
   created_at: string;
   updated_at: string;
 }

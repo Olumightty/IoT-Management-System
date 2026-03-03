@@ -14,10 +14,13 @@ services:
       - ./influxdb/config:/etc/influxdb2
 
   mosquitto:
-    image: eclipse-mosquitto:latest
+    image: iegomez/mosquitto-go-auth:latest
     ports:
       - "1883:1883"
     volumes:
-      - ./mosquitto/config:/mosquitto/config
+      # Ensure mosquitto.conf is a FILE in the same folder as this compose file
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    # This command forces Mosquitto to use the specific path we mounted
+    command: mosquitto -c /mosquitto/config/mosquitto.conf

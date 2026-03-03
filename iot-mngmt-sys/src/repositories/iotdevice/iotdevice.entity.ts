@@ -39,6 +39,12 @@ export class IoTDevice {
   @OneToMany(() => Appliance, (appliance) => appliance.iot_device)
   appliances: Appliance[];
 
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ default: false })
+  is_muted: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
