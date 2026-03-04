@@ -43,7 +43,7 @@ export class DevicesController {
     return this.devicesService.updateDevice(
       id,
       updateDeviceDto,
-      req['user'].sub
+      req['user'].sub,
     );
   }
 

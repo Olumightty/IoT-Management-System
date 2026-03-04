@@ -104,7 +104,10 @@ export class AuthController {
     const { username, password } = body;
     console.log('MQTT Auth attempt for username:', username);
     // For the Superuser, we can allow it to bypass device credential checks
-    if(username === process.env.MQTT_USERNAME && password === process.env.MQTT_PASSWORD) {
+    if (
+      username === process.env.MQTT_USERNAME &&
+      password === process.env.MQTT_PASSWORD
+    ) {
       return { status: 'allow' };
     }
 
@@ -129,7 +132,12 @@ export class AuthController {
     const { username } = body;
 
     const isServer = username === process.env.MQTT_USERNAME;
-    console.log('Superuser check for username:', username, 'isServer:', isServer);
+    console.log(
+      'Superuser check for username:',
+      username,
+      'isServer:',
+      isServer,
+    );
     if (!isServer) {
       throw new UnauthorizedException('Superuser Denied');
     }

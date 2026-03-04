@@ -8,6 +8,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { CreateAnalyticsDto } from '../dto/create-analytics.dto';
 import { GetAnalyticsDto } from '../dto/get-analytics.dto';
+import { Analytics } from '../entities/analytics.entity';
 
 @Injectable()
 export class InfluxService {
@@ -79,7 +80,7 @@ export class InfluxService {
       });
 
       return {
-        data: results,
+        data: results as Analytics[],
         message: 'Metrics retrieved from InfluxDB',
         status: true,
       };

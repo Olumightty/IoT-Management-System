@@ -12,7 +12,10 @@ import { TelemetryDataDto } from './dto/telemetry-data.dto';
 export class MqttController {
   constructor(private readonly mqttService: MqttService) {}
   @MessagePattern('energy/+/+/telemetry')
-  async getNotifications(@Payload() data: TelemetryDataDto, @Ctx() context: MqttContext) {
+  async getNotifications(
+    @Payload() data: TelemetryDataDto,
+    @Ctx() context: MqttContext,
+  ) {
     const deviceId = context.getTopic().split('/')[1];
     const appliance = context.getTopic().split('/')[2];
     await this.mqttService.processTelemetryMessage(deviceId, appliance, data);

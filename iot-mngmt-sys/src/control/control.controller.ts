@@ -7,7 +7,7 @@ import type { Request } from 'express';
 @Controller('control')
 export class ControlController {
   constructor(private readonly controlService: ControlService) {}
-  
+
   @Post()
   @UseGuards(AuthGuard)
   command(@Body() createControlDto: CreateControlDto, @Req() req: Request) {
