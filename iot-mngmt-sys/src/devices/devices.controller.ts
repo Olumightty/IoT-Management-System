@@ -73,6 +73,22 @@ export class DevicesController {
     );
   }
 
+  @Patch(':id/appliances/:label')
+  @UseGuards(AuthGuard)
+  updateAppliance(
+    @Param('id') id: string,
+    @Param('label') label: string,
+    @Body() updateApplianceDto: UpdateApplianceDto,
+    @Req() req: Request,
+  ) {
+    return this.devicesService.updateAppliance(
+      updateApplianceDto,
+      id,
+      label,
+      req['user'].sub,
+    );
+  }
+
   @Delete(':id/appliances/:slug')
   @UseGuards(AuthGuard)
   removeAppliance(

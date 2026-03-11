@@ -11,6 +11,11 @@ export interface CreateAppliancePayload {
   label: string;
 }
 
+export interface UpdateAppliancePayload {
+  rated_power?: number;
+  monthly_usage?: number;
+}
+
 export async function getDevices(
   client: AxiosInstance,
 ): Promise<Device[]> {
@@ -68,6 +73,19 @@ export async function removeAppliance(
     `/devices/${deviceId}/appliances/${slug}`,
   );
   return response.data;
+}
+
+export async function updateAppliance(
+  client: AxiosInstance,
+  deviceId: string,
+  label: string,
+  payload: UpdateAppliancePayload,
+): Promise<Appliance> {
+  const response = await client.patch<{ data: Appliance }>(
+    `/devices/${deviceId}/appliances/${label}`,
+    payload,
+  );
+  return response.data.data;
 }
 
 export async function updateDevice(

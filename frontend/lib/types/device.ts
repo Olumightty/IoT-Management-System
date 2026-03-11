@@ -14,6 +14,7 @@ export interface Appliance {
   label: string;
   iot_device_id: string;
   rated_power: number;
+  monthly_usage?: number;
   created_at: string;
   updated_at: string;
 }

@@ -39,3 +39,38 @@ export interface MaintenanceStatus {
   lastReset?: string;
   projectedServiceDate?: string; // New field
 }
+
+export interface InsightWarning {
+  type: string;
+  severity: string;
+  message: string;
+}
+
+export interface InsightSummary {
+  avgPower: string;
+  uptime: string;
+  healthScore: number;
+}
+
+export interface InsightAiGen {
+  warnings: InsightWarning[];
+  insights: string[];
+  recommendations: string[];
+}
+
+export interface InsightReport {
+  summary: InsightSummary;
+  aiGen: InsightAiGen;
+  billing: {
+    unitsConsumed: number;
+    costofUnitsConsumed: number;
+    monthlyForcastedUnitConsumed: number;
+    monthlyForcatedCostofUnitsConsumed: number;
+  };
+}
+
+export interface InsightsResponse {
+  message: string;
+  status: boolean;
+  report: InsightReport | null;
+}

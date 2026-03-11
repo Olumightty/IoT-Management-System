@@ -1,5 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface AuthShellProps extends PropsWithChildren {
   title: string;
@@ -18,6 +20,11 @@ export function AuthShell({ title, subtitle, footer, children }: AuthShellProps)
         <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
           {subtitle}
         </p>
+        <div className="mt-4 flex items-center justify-center">
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/docs">Read the Docs</Link>
+          </Button>
+        </div>
       </div>
       <Card className="w-full max-w-xl border-white/10">
         <div className="space-y-8">{children}</div>

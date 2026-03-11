@@ -33,6 +33,11 @@ export function ApplianceCard({
           <p className="text-xs text-[var(--color-muted-foreground)]">
             Rated {appliance.rated_power} W
           </p>
+          {appliance.monthly_usage !== undefined ? (
+            <p className="text-xs text-[var(--color-muted-foreground)]">
+              Goal {appliance.monthly_usage.toFixed(1)} kWh/mo
+            </p>
+          ) : null}
         </div>
         <div className="flex items-center gap-2">
           <button

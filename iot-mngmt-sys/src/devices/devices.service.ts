@@ -10,6 +10,7 @@ import { IoTDeviceService } from 'src/repositories/iotdevice/iotdevice.service';
 import { CreateApplianceDto } from './dto/create-appliance.dto';
 import { ApplianceService } from 'src/repositories/appliance/appliance.service';
 import { QueryFailedError } from 'typeorm';
+import { UpdateApplianceDto } from './dto/update-appliance.dto';
 
 @Injectable()
 export class DevicesService {
@@ -119,6 +120,40 @@ export class DevicesService {
       }
       console.log(error);
       throw new HttpException('Failed to create device', 500);
+    }
+  }
+
+  async updateAppliance(
+    updateApplianceDto: UpdateApplianceDto,
+    iot_device_id: string,
+    label: string,
+    userId: string,
+  ) {
+    try {
+      const device = await this.iotDeviceService.findOne({
+        id: iot_device_id,
+        user_id: userId,
+      });
+
+      if (!device) throw new ForbiddenException();
+      const updatedAppliance = await this.appliancesService.update(
+        {
+          label,
+          iot_device_id,
+        },
+        updateApplianceDto,
+      );
+      return {
+        data: updatedAppliance,
+        message: 'Appliance updated successfully',
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { status: 500, message: 'Something went wrong' },
+        500,
+        { cause: error },
+      );
     }
   }
 

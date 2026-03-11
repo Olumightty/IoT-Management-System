@@ -32,6 +32,9 @@ export class Appliance {
   @Column({ type: 'float' }) // Using float for power ratings is safer for precision
   rated_power: number; // Fixed typo from 'reted_power'
 
+  @Column({ default: 10 })
+  monthly_usage: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
