@@ -14,6 +14,12 @@ export function BudgetProgressBar({
   currency = "NGN",
 }: BudgetProgressBarProps) {
   const progress = goal > 0 ? Math.min((currentUsage / goal) * 100, 100) : 0;
+  const barColor =
+    progress >= 100
+      ? "bg-rose-400"
+      : progress >= 85
+        ? "bg-amber-400"
+        : "bg-emerald-400";
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -37,7 +43,7 @@ export function BudgetProgressBar({
       </div>
       <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-emerald-400 transition-all"
+          className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${progress}%` }}
         />
       </div>

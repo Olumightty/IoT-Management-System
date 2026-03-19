@@ -1,0 +1,34 @@
+name: "API CI"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build_client:
+    name: "Build the Application"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4.2.2
+
+      - name: "Setup Node.js environment"
+        uses: actions/setup-node@v3.9.1
+        with:
+          node-version: 22.x
+
+      - name: "Install Packages"
+        working-directory: ./iot-mngmt-sys
+        run: npm install
+
+      # - name: "Lint"
+      #   working-directory: ./iot-mngmt-sys
+      #   run: npm run lint
+
+      - name: "Build"
+        working-directory: ./iot-mngmt-sys
+        run: npm run build

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Appliance, Device } from "@/lib/types/device";
 import type { InsightReport, InsightWarning } from "@/lib/types/analytics";
 import { Card } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import { AnomalyCard } from "./anomaly-card";
 import { MaintenanceCard } from "./maintenance-card";
 import { ControlPanel } from "@/components/features/dashboard/control-panel";
 import { getInsights } from "@/lib/api/analytics";
+import { RefreshCw } from "lucide-react";
 
 type RangeKey = "24h" | "7d" | "30d";
 
@@ -116,29 +117,30 @@ export function ApplianceDetail({
     });
   }, [appliance.label, device.id, range, setActiveChannel]);
 
-  useEffect(() => {
-    let isActive = true;
+  const fetchInsights = useCallback(async () => {
     setInsightsLoading(true);
     setInsightsError(null);
-    getInsights(apiClient, device.id, appliance.label)
-      .then((report) => {
-        if (!isActive) return;
-        setInsights(report);
-      })
-      .catch(() => {
-        if (!isActive) return;
-        setInsightsError("Unable to load the AI insight report right now.");
-        setInsights(null);
-      })
-      .finally(() => {
-        if (!isActive) return;
-        setInsightsLoading(false);
-      });
+    try {
+      const report = await getInsights(apiClient, device.id, appliance.label);
+      setInsights(report);
+    } catch {
+      setInsightsError("Unable to load the AI insight report right now.");
+      setInsights(null);
+    } finally {
+      setInsightsLoading(false);
+    }
+  }, [apiClient, appliance.label, device.id]);
 
+  useEffect(() => {
+    let isActive = true;
+    (async () => {
+      if (!isActive) return;
+      await fetchInsights();
+    })();
     return () => {
       isActive = false;
     };
-  }, [apiClient, appliance.label, device.id]);
+  }, [fetchInsights]);
 
   const averagePower =
     metrics.length > 0
@@ -352,6 +354,20 @@ export function ApplianceDetail({
       <Card
         title="AI Insight Report"
         description="7-day intelligence summary generated from historical telemetry."
+        action={
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={fetchInsights}
+            disabled={insightsLoading}
+            aria-label="Refresh AI insight report"
+          >
+            <RefreshCw
+              size={16}
+              className={insightsLoading ? "animate-spin" : ""}
+            />
+          </Button>
+        }
       >
         {insightsLoading ? (
           <div className="space-y-4">
