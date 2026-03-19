@@ -7,6 +7,17 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# 🛡️ Add this block right here
+permissions:
+  contents: read       # Required to checkout the code
+  pull-requests: read  # Required for Snyk/Sonar to analyze PR metadata
+  security-events: write # Required if you are uploading SARIF results
+
+# Ensure that only one workflow run is running at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   # 1. Call API CI file
   call-api-ci:
