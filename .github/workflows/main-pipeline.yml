@@ -10,27 +10,27 @@ on:
 jobs:
   # 1. Call API CI file
   call-api-ci:
-    uses: ./CI.yml # 👈 Path to your file
+    uses: ./.github/workflows/CI.yml # 👈 Path to your file
     secrets: inherit # Pass secrets down to the sub-workflow
 
   # 2. Call SAST file
   call-sast:
-    uses: ./SAST.yml
+    uses: ./.github/workflows/SAST.yml
     secrets: inherit
 
   # 3. Call SCA file
   call-sca:
-    uses: ./SCA.yml
+    uses: ./.github/workflows/SCA.yml
     secrets: inherit
 
   # 🚀 THE FINAL GATE: This job ONLY runs if all 3 'calls' above return success
   build-and-push-docker-image:
     needs: [call-api-ci, call-sast, call-sca] 
-    uses: ./CB.yml
+    uses: ./.github/workflows/CB.yml
     secrets: inherit
 
   # 4. Call Container Scan
   call-cs:
-    uses: ./CS.yml
+    uses: ./.github/workflows/CS.yml
     needs: build-and-push-docker-image
     secrets: inherit
