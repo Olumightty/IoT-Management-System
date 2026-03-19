@@ -25,10 +25,10 @@ jobs:
     uses: ./.github/workflows/CI.yml # 👈 Path to your file
     secrets: inherit # Pass secrets down to the sub-workflow
 
-#   # 2. Call SAST file
-#   call-sast:
-#     uses: ./.github/workflows/SAST.yml
-#     secrets: inherit
+  # 2. Call SAST file
+  call-sast:
+    uses: ./.github/workflows/SAST.yml
+    secrets: inherit
 
   # 3. Call SCA file
   call-sca:
