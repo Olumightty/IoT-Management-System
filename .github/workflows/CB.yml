@@ -1,11 +1,7 @@
 name: Container Build
 
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["API CI", "SAST", "SCA"]
-    types:
-      - completed
+  workflow_call:
 
 # vars and secrets to be specified in the settings panel of github repo
 

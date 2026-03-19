@@ -1,11 +1,7 @@
 name: Trivy Container Scan
 
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: ["Container Build"]
-    types:
-      - completed
+  workflow_call:
   schedule:
     - cron: '29 5 * * 2'
 
