@@ -38,11 +38,13 @@ jobs:
   # 🚀 THE FINAL GATE: This job ONLY runs if all 3 'calls' above return success
   build-and-push-docker-image:
     needs: [call-api-ci, call-sca]
+    if: ${{ always() && needs.call-api-ci.result == 'success' && needs.call-sca.result == 'success' }}
     uses: ./.github/workflows/CB.yml
     secrets: inherit
 
   # 4. Call Container Scan
   call-cs:
     uses: ./.github/workflows/CS.yml
+    if: ${{ needs.build-and-push-docker-image.result == 'success' }}
     needs: build-and-push-docker-image
     secrets: inherit
