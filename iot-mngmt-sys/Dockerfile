@@ -1,4 +1,4 @@
-from node:22-alpine as builder
+FROM node:22-alpine AS builder
 
 
 WORKDIR /app
@@ -8,11 +8,12 @@ RUN npm install
 COPY ./iot-mngmt-sys .
 RUN npm run build
 
-FROM node:22-alpine as runner
+FROM node:22-alpine As runner
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
+COPY ./iot-mngmt-sys/package*.json .
+RUN npm install --omit=dev
+
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 5000
