@@ -15,6 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4 # 👈 Use v4 for better caching
+        with:
+          java-version: '17'
+          distribution: 'temurin' # 'zulu' or 'adopt' also work
+          
       - name: Analyze with SonarQube
 
         # You can pin the exact commit or the version.
