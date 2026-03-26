@@ -8,7 +8,12 @@ import morgan from 'morgan';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({ credentials: true, origin: true });
+  app.enableCors({
+    credentials: true,
+    origin: process.env.CLIENT_ORIGIN || true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.MQTT,
     options: {
@@ -20,6 +25,7 @@ async function bootstrap() {
         qos: 0,
       },
       username: process.env.MQTT_USERNAME,
+      ca: process.env.MQTT_CERT || undefined,
       password: process.env.MQTT_PASSWORD,
       reconnectPeriod: 5000,
     },

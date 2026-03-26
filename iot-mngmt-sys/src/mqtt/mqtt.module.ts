@@ -21,6 +21,7 @@ import { ApplianceModule } from 'src/repositories/appliance/appliance.module';
             protocolVersion: 5,
             username: configService.get<string>('MQTT_USERNAME'),
             password: configService.get<string>('MQTT_PASSWORD'),
+            ca: configService.get<string>('MQTT_CERT') || undefined,
             reconnectPeriod: 5000, // Reconnect every 5 seconds if disconnected
           },
         }),
