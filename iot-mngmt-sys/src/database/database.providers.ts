@@ -12,6 +12,9 @@ export const databaseProviders = [
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        extra: {
+          family: 4,
+        },
         synchronize: process.env.NODE_ENV === 'development', // Keep true for development only
         logging: true, // Helpful for debugging joins
       });
