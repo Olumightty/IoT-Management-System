@@ -15,7 +15,7 @@ import type { Appliance } from "@/lib/types/device";
 const applianceSchema = z.object({
   label: z.string().min(2, "Appliance label is required"),
   rated_power: z
-    .number({ coerce: true })
+    .number()
     .positive("Rated power must be greater than 0"),
 });
 

@@ -46,7 +46,7 @@ export function RegisterForm() {
     try {
       // Create the account then hydrate client auth and redirect.
       const authResponse = await registerUser(apiClient, values);
-      const profile = await fetchProfile(apiClient);
+      const profile = await fetchProfile(apiClient, '');
       setSession(authResponse.accessToken, profile);
       router.push("/dashboard");
     } catch (error) {
