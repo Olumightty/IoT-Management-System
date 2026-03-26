@@ -24,8 +24,10 @@ async function bootstrap() {
       subscribeOptions: {
         qos: 0,
       },
+      protocol: process.env.NODE_ENV === 'production' ? 'mqtts' : 'mqtt', // only tls in production
       username: process.env.MQTT_USERNAME,
       ca: process.env.MQTT_CERT || undefined,
+      cert: process.env.MQTT_CERT || undefined,
       password: process.env.MQTT_PASSWORD,
       reconnectPeriod: 5000,
     },

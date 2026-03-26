@@ -20,8 +20,13 @@ import { ApplianceModule } from 'src/repositories/appliance/appliance.module';
             clientId: configService.get<string>('MQTT_CLIENT_ID') + '_pub',
             protocolVersion: 5,
             username: configService.get<string>('MQTT_USERNAME'),
+            protocol:
+              configService.get<string>('NODE_ENV') === 'production'
+                ? 'mqtts'
+                : 'mqtt',
             password: configService.get<string>('MQTT_PASSWORD'),
             ca: configService.get<string>('MQTT_CERT') || undefined,
+            cert: configService.get<string>('MQTT_CERT') || undefined,
             reconnectPeriod: 5000, // Reconnect every 5 seconds if disconnected
           },
         }),
