@@ -72,7 +72,8 @@ export class AuthController {
     res.cookie('refreshToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Security: only send over HTTPS in prod
-      sameSite: 'strict', // Security: Prevent CSRF
+      domain: '.ingress.ink',
+      sameSite: 'none',
       maxAge: 0,
     });
     return { message: 'Logged out successfully' };
