@@ -38,7 +38,15 @@ export class MqttService {
   }
 
   publishCommand(deviceId: string, appliance: string, command: any) {
-    console.log('Publishing command:', command);
+    const d = new Date();
+
+    const pad = (n, length = 2) => String(n).padStart(length, '0');
+
+    const formatted =
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}:` +
+      `${pad(d.getMilliseconds(), 3)}`;
+    console.log('Publishing command:', command, formatted);
     this.client.emit(`cmnd/${deviceId}/${appliance}/state`, command);
   }
 }
