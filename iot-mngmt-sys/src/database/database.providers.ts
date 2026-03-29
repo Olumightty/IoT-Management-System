@@ -17,7 +17,7 @@ const dataSource = new DataSource({
     family: 4,
   },
   synchronize: process.env.NODE_ENV === 'development', // Keep true for development only
-  logging: true, // Helpful for debugging joins
+  logging: false, // Helpful for debugging joins
 });
 export const databaseProviders = [
   {

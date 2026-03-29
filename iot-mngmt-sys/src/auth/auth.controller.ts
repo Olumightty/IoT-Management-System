@@ -48,8 +48,9 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Security: only send over HTTPS in prod
-      domain: '.ingress.ink',
-      sameSite: 'none',
+      domain:
+        process.env.NODE_ENV === 'production' ? '.ingress.ink' : undefined,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -73,8 +74,9 @@ export class AuthController {
     res.cookie('refreshToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Security: only send over HTTPS in prod
-      domain: '.ingress.ink',
-      sameSite: 'none',
+      domain:
+        process.env.NODE_ENV === 'production' ? '.ingress.ink' : undefined,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       maxAge: 0,
     });
     return { message: 'Logged out successfully' };
