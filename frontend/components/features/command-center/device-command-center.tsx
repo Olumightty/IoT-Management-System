@@ -45,7 +45,7 @@ export function DeviceCommandCenter({
 }) {
   const [applianceList, setApplianceList] =
     useState<Appliance[]>(appliances);
-  const [selectedAppliance, setSelectedAppliance] = useState(
+  const [selectedAppliance, setSelectedAppliance] = useState<string | null>(
     appliances[0]?.label ?? null,
   );
   const [deleteState, setDeleteState] = useState<{
