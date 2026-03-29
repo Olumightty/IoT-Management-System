@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/providers/auth-provider";
 import { removeDevice } from "@/lib/api/devices";
 import type { Device } from "@/lib/types/device";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface DevicePanelProps {
   devices: Device[];
@@ -26,6 +27,7 @@ export function DevicePanel({
 }: DevicePanelProps) {
   const { apiClient } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
+  const [confirmDeviceId, setConfirmDeviceId] = useState<string | null>(null);
 
   const removeMutation = useMutation({
     // Delegate deletion to the backend and prune local state on success.
@@ -57,6 +59,24 @@ export function DevicePanel({
       className="h-full"
     >
       <div className="space-y-3">
+        <ConfirmModal
+          open={Boolean(confirmDeviceId)}
+          title="Delete device?"
+          description={
+            confirmDeviceId
+              ? "This will remove the device and all linked appliances."
+              : undefined
+          }
+          confirmLabel="Delete"
+          onConfirm={() => {
+            if (confirmDeviceId) {
+              removeMutation.mutate(confirmDeviceId);
+              setConfirmDeviceId(null);
+            }
+          }}
+          onCancel={() => setConfirmDeviceId(null)}
+          loading={removeMutation.isPending}
+        />
         {actionError ? <Alert variant="error">{actionError}</Alert> : null}
         {devices.length === 0 ? (
           <p className="text-sm text-[var(--color-muted-foreground)]">
@@ -92,7 +112,7 @@ export function DevicePanel({
                     variant="ghost"
                     size="sm"
                     className="ml-3"
-                    onClick={() => removeMutation.mutate(device.id)}
+                    onClick={() => setConfirmDeviceId(device.id)}
                     disabled={removeMutation.isPending}
                   >
                     {removeMutation.isPending ? "Removing..." : "Remove"}

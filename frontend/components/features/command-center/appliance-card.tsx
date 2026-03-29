@@ -3,12 +3,16 @@
 import Link from "next/link";
 import type { Appliance } from "@/lib/types/device";
 import { useTelemetry } from "@/components/providers/telemetry-provider";
+import { Button } from "@/components/ui/button";
+import { Eye, Trash2 } from "lucide-react";
 
 interface ApplianceCardProps {
   deviceId: string;
   appliance: Appliance;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete?: (label: string) => void;
+  deleting?: boolean;
 }
 
 export function ApplianceCard({
@@ -16,6 +20,8 @@ export function ApplianceCard({
   appliance,
   isSelected,
   onSelect,
+  onDelete,
+  deleting = false,
 }: ApplianceCardProps) {
   const { liveData } = useTelemetry();
   const isActive =
@@ -40,19 +46,30 @@ export function ApplianceCard({
           ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant={isSelected ? "primary" : "secondary"}
             onClick={onSelect}
-            className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-wide text-slate-100 hover:border-emerald-300/60"
           >
-            Select
-          </button>
-          <Link
-            href={`/devices/${deviceId}/${appliance.label}`}
-            className="text-xs uppercase tracking-wide text-emerald-200/70"
-          >
-            View
-          </Link>
+            {isSelected ? "Selected" : "Select"}
+          </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link href={`/devices/${deviceId}/${appliance.label}`}>
+              <Eye size={14} />
+            </Link>
+          </Button>
+          {onDelete ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => onDelete(appliance.label)}
+              disabled={deleting}
+            >
+              <Trash2 size={14} />
+            </Button>
+          ) : null}
         </div>
       </div>
       <div className="mt-3 text-xs text-[var(--color-muted-foreground)]">

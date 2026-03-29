@@ -18,6 +18,9 @@ import { MaintenanceCard } from "./maintenance-card";
 import { AnomalyCard } from "./anomaly-card";
 import { CreateApplianceForm } from "@/components/features/dashboard/create-appliance-form";
 import { Copy } from "lucide-react";
+import { removeAppliance } from "@/lib/api/devices";
+import { useAuth } from "@/components/providers/auth-provider";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 type RangeKey = "24h" | "7d" | "30d";
 
@@ -45,9 +48,16 @@ export function DeviceCommandCenter({
   const [selectedAppliance, setSelectedAppliance] = useState(
     appliances[0]?.label ?? null,
   );
+  const [deleteState, setDeleteState] = useState<{
+    label: string | null;
+    error: string | null;
+    pending: boolean;
+  }>({ label: null, error: null, pending: false });
+  const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
   const [rangeKey, setRangeKey] = useState<RangeKey>("24h");
   const range = useMemo(() => getRange(rangeKey), [rangeKey]);
   const { lastError } = useSocket();
+  const { apiClient } = useAuth();
   const {
     metrics,
     liveData,
@@ -89,8 +99,47 @@ export function DeviceCommandCenter({
       entry.deviceId === device.id && entry.appliance === selectedAppliance,
   );
 
+  const handleDeleteAppliance = async (label: string) => {
+    setConfirmLabel(label);
+  };
+
+  const confirmDeleteAppliance = async () => {
+    if (!confirmLabel) return;
+    setDeleteState({ label: confirmLabel, error: null, pending: true });
+    try {
+      await removeAppliance(apiClient, device.id, confirmLabel);
+      setApplianceList((prev) =>
+        prev.filter((item) => item.label !== confirmLabel),
+      );
+      setSelectedAppliance((prev) =>
+        prev === confirmLabel ? null : prev,
+      );
+      setDeleteState({ label: null, error: null, pending: false });
+      setConfirmLabel(null);
+    } catch {
+      setDeleteState({
+        label: confirmLabel,
+        error: "Unable to delete this appliance right now.",
+        pending: false,
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <ConfirmModal
+        open={Boolean(confirmLabel)}
+        title="Delete appliance?"
+        description={
+          confirmLabel
+            ? `This will permanently remove ${confirmLabel}.`
+            : undefined
+        }
+        confirmLabel="Delete"
+        onConfirm={confirmDeleteAppliance}
+        onCancel={() => setConfirmLabel(null)}
+        loading={deleteState.pending}
+      />
       <Breadcrumbs
         items={[
           { label: "Dashboard", href: "/dashboard" },
@@ -199,6 +248,9 @@ export function DeviceCommandCenter({
           className="lg:col-span-2"
         >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {deleteState.error ? (
+              <Alert variant="error">{deleteState.error}</Alert>
+            ) : null}
             {applianceList.length === 0 ? (
               <p className="text-sm text-[var(--color-muted-foreground)]">
                 No appliances connected yet.
@@ -211,6 +263,10 @@ export function DeviceCommandCenter({
                   appliance={appliance}
                   isSelected={selectedAppliance === appliance.label}
                   onSelect={() => setSelectedAppliance(appliance.label)}
+                  onDelete={handleDeleteAppliance}
+                  deleting={
+                    deleteState.pending && deleteState.label === appliance.label
+                  }
                 />
               ))
             )}

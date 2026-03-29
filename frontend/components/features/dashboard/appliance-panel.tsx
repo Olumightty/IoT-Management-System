@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/providers/auth-provider";
 import { removeAppliance } from "@/lib/api/devices";
 import type { Appliance } from "@/lib/types/device";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface AppliancePanelProps {
   deviceId: string | null;
@@ -32,6 +33,7 @@ export function AppliancePanel({
 }: AppliancePanelProps) {
   const { apiClient } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
+  const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
 
   const removeMutation = useMutation({
     // Removes an appliance from the selected device via the API and syncs UI state.
@@ -69,6 +71,24 @@ export function AppliancePanel({
       <div className="space-y-3">
         {error ? <Alert variant="error">{error}</Alert> : null}
         {actionError ? <Alert variant="error">{actionError}</Alert> : null}
+        <ConfirmModal
+          open={Boolean(confirmLabel)}
+          title="Delete appliance?"
+          description={
+            confirmLabel
+              ? `This will permanently remove ${confirmLabel}.`
+              : undefined
+          }
+          confirmLabel="Delete"
+          onConfirm={() => {
+            if (confirmLabel) {
+              removeMutation.mutate(confirmLabel);
+              setConfirmLabel(null);
+            }
+          }}
+          onCancel={() => setConfirmLabel(null)}
+          loading={removeMutation.isPending}
+        />
         {loading ? (
           <p className="text-sm text-[var(--color-muted-foreground)]">
             Loading appliances...
@@ -110,7 +130,7 @@ export function AppliancePanel({
                     variant="ghost"
                     size="sm"
                     className="ml-3"
-                    onClick={() => removeMutation.mutate(appliance.label)}
+                    onClick={() => setConfirmLabel(appliance.label)}
                     disabled={removeMutation.isPending}
                   >
                     {removeMutation.isPending ? "Removing..." : "Remove"}

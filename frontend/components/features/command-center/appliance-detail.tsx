@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTelemetry } from "@/components/providers/telemetry-provider";
 import { useSocket } from "@/components/providers/socket-provider";
 import { useAuth } from "@/components/providers/auth-provider";
-import { updateAppliance } from "@/lib/api/devices";
+import { removeAppliance, updateAppliance } from "@/lib/api/devices";
 import { BrushTelemetryChart } from "./brush-telemetry-chart";
 import { MultiAxisTelemetryChart } from "./multi-axis-telemetry-chart";
 import { TemperatureHeatmapCard } from "./temperature-heatmap-card";
@@ -22,6 +22,8 @@ import { MaintenanceCard } from "./maintenance-card";
 import { ControlPanel } from "@/components/features/dashboard/control-panel";
 import { getInsights } from "@/lib/api/analytics";
 import { RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 type RangeKey = "24h" | "7d" | "30d";
 
@@ -92,10 +94,15 @@ export function ApplianceDetail({
   );
   const [ratedPowerError, setRatedPowerError] = useState<string | null>(null);
   const [monthlyUsageError, setMonthlyUsageError] = useState<string | null>(null);
+  const [deleteState, setDeleteState] = useState<"idle" | "deleting" | "error">(
+    "idle",
+  );
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [rangeKey, setRangeKey] = useState<RangeKey>("24h");
   const range = useMemo(() => getRange(rangeKey), [rangeKey]);
   const { lastError } = useSocket();
   const { apiClient } = useAuth();
+  const router = useRouter();
   const [insights, setInsights] = useState<InsightReport | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [insightsError, setInsightsError] = useState<string | null>(null);
@@ -240,8 +247,27 @@ export function ApplianceDetail({
     }
   };
 
+  const handleDeleteAppliance = async () => {
+    setDeleteState("deleting");
+    try {
+      await removeAppliance(apiClient, device.id, applianceState.label);
+      router.push(`/devices/${device.id}`);
+    } catch {
+      setDeleteState("error");
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <ConfirmModal
+        open={deleteOpen}
+        title="Delete appliance?"
+        description={`This will permanently remove ${applianceState.label}.`}
+        confirmLabel="Delete"
+        onConfirm={handleDeleteAppliance}
+        onCancel={() => setDeleteOpen(false)}
+        loading={deleteState === "deleting"}
+      />
       <Breadcrumbs
         items={[
           { label: "Dashboard", href: "/dashboard" },
@@ -604,6 +630,13 @@ export function ApplianceDetail({
           <Button onClick={handleApplianceUpdate} disabled={applianceSaveState === "saving"}>
             {applianceSaveState === "saving" ? "Saving..." : "Save changes"}
           </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setDeleteOpen(true)}
+            disabled={deleteState === "deleting"}
+          >
+            {deleteState === "deleting" ? "Deleting..." : "Delete appliance"}
+          </Button>
           {applianceSaveMessage ? (
             <span
               className={`text-sm ${
@@ -613,6 +646,11 @@ export function ApplianceDetail({
               }`}
             >
               {applianceSaveMessage}
+            </span>
+          ) : null}
+          {deleteState === "error" ? (
+            <span className="text-sm text-rose-200">
+              Unable to delete appliance right now.
             </span>
           ) : null}
         </div>
