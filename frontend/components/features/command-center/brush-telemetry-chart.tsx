@@ -153,7 +153,7 @@ export function BrushTelemetryChart({
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" variant="ghost" onClick={() => setLastWindow(6)}>
+          {/* <Button size="sm" variant="ghost" onClick={() => setLastWindow(6)}>
             Last 6h
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setLastWindow(12)}>
@@ -171,7 +171,7 @@ export function BrushTelemetryChart({
             }}
           >
             Full Range
-          </Button>
+          </Button> */}
         </div>
       </div>
 

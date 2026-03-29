@@ -7,7 +7,7 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
-# 🛡️ Add this block right here
+# Block
 permissions:
   contents: read       # Required to checkout the code
   pull-requests: read  # Required for Snyk/Sonar to analyze PR metadata
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   # 1. Call API CI file
   call-api-ci:
-    uses: ./.github/workflows/CI.yml # 👈 Path to your file
+    uses: ./.github/workflows/CI.yml
     secrets: inherit # Pass secrets down to the sub-workflow
 
   # 2. Call SAST file
@@ -35,7 +35,7 @@ jobs:
     uses: ./.github/workflows/SCA.yml
     secrets: inherit
 
-  # 🚀 THE FINAL GATE: This job ONLY runs if all 3 'calls' above return success
+  # This job ONLY runs if all 3 'calls' above return success
   build-and-push-docker-image:
     needs: [call-api-ci, call-sast, call-sca]
     uses: ./.github/workflows/CB.yml
