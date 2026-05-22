@@ -162,6 +162,12 @@ export function ApplianceDetail({
     liveData?.deviceId === device.id && liveData?.appliance === appliance.label
       ? liveData.temperature ?? null
       : metrics[metrics.length - 1]?.temperature ?? null;
+  const latestCurrentDraw =
+    liveData?.deviceId === device.id && liveData?.appliance === appliance.label
+      ? liveData.current
+      : metrics[metrics.length - 1]?.current;
+  const appliancePowerState =
+    latestCurrentDraw && latestCurrentDraw > 0 ? "On" : "Off";
 
   const activeMaintenance = maintenanceStatus.find(
     (entry) =>
@@ -278,9 +284,14 @@ export function ApplianceDetail({
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-50">
-            {appliance.label}
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-slate-50">
+              {appliance.label}
+            </h1>
+            <Badge variant={appliancePowerState === "On" ? "accent" : "muted"}>
+              {appliancePowerState}
+            </Badge>
+          </div>
           <p className="text-sm text-[var(--color-muted-foreground)]">
             Appliance telemetry and AI insights
           </p>

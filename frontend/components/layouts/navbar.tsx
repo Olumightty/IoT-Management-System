@@ -8,6 +8,7 @@ import { LogoutButton } from "@/components/features/auth/logout-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const NAV_LINKS = [
   { href: "/docs", label: "Docs" },
@@ -26,9 +27,19 @@ export function Navbar() {
         <div className="flex items-center gap-6">
           <Link
             href="/"
-            className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-200/90"
+            className="text-sm flex items-center font-semibold uppercase tracking-[0.25em] text-emerald-200/90"
           >
-            IoT Console
+            <Image
+              src="/logo.png"
+              alt="Ingress Logo"
+              width={24}
+              height={24}
+              className="inline-block mr-2"
+            />
+            <div>
+              Ingress <br /> <span className="text-xs">IoT</span>
+            </div>
+            
           </Link>
           <nav className="hidden items-center gap-4 text-sm text-[var(--color-muted-foreground)] sm:flex">
             {NAV_LINKS.map((item) => (

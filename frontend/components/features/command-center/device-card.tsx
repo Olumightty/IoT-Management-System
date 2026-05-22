@@ -10,11 +10,9 @@ interface DeviceCardProps {
 }
 
 export function DeviceCard({ device }: DeviceCardProps) {
-  const { deviceHealth, lastHeartbeat, anomalies, liveData } = useTelemetry();
+  const { deviceHealth, lastHeartbeat, liveData } = useTelemetry();
   const status = deviceHealth[device.id] ?? "idle";
   const lastSeen = lastHeartbeat[device.id];
-  const anomalyCount = anomalies.filter((item) => item.deviceId === device.id)
-    .length;
   const powerSummary =
     liveData?.deviceId === device.id ? liveData.power.toFixed(2) : null;
 
@@ -35,11 +33,11 @@ export function DeviceCard({ device }: DeviceCardProps) {
         <StatusBadge status={status} />
       </div>
       <div className="mt-4 space-y-2 text-sm text-[var(--color-muted-foreground)]">
+        <p>{device.description?.trim() || "No description provided yet."}</p>
         <p>
           Power summary: {powerSummary ? `${powerSummary} W` : "Awaiting telemetry"}
         </p>
         <p>Last active: {lastSeen ? new Date(lastSeen).toLocaleString() : "No telemetry yet"}</p>
-        <p>Anomalies: {anomalyCount}</p>
       </div>
       <div className="mt-4 text-xs uppercase tracking-wide text-emerald-200/70">
         Open Command Center
