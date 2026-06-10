@@ -46,3 +46,9 @@ jobs:
     uses: ./.github/workflows/CS.yml
     needs: build-and-push-docker-image
     secrets: inherit
+
+  # 5. Call CD file
+  call-cd:
+    uses: ./.github/workflows/CD.yml
+    needs: call-cs
+    secrets: inherit
