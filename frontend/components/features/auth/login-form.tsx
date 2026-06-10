@@ -48,7 +48,8 @@ export function LoginForm() {
       //because profile fetching requires an access token which cause a 401 error when not present leading to the loop I was seeing 
       const profile = await fetchProfile(apiClient, authResponse.accessToken);
       setSession(authResponse.accessToken, profile);
-      router.push("/dashboard");
+      window.location.reload(); // Force a full page reload to reset any in-memory state and ensure the dashboard loads fresh with the new session.
+      // router.push("/dashboard");
     } catch (error) {
       if (isAxiosError(error)) {
         setFormError(
