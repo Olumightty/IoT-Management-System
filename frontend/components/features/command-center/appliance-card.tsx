@@ -109,9 +109,9 @@ export function ApplianceCard({
           {commandMutation.isPending ? "Sending..." : "Turn OFF"}
         </Button>
       </div>
-      <div className="mt-3 text-xs text-[var(--color-muted-foreground)]">
+      {/* <div className="mt-3 text-xs text-[var(--color-muted-foreground)]">
         {isActive ? `Live power ${liveData?.power.toFixed(2)} W` : "No live telemetry yet"}
-      </div>
+      </div> */}
       {statusMessage ? (
         <p className="mt-1 text-xs text-emerald-200">{statusMessage}</p>
       ) : null}
