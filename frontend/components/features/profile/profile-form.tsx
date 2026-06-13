@@ -25,7 +25,7 @@ const schema = z.object({
       message: "Use Nigerian format: +234XXXXXXXXXX",
     }),
   country: z.string().min(1, "Country is required").max(60, "Country name is too long").optional(),
-  tarriff_rate: z.number().optional(),
+  tarriff_rate: z.string().refine((value) => !value || /^\d+(\.\d{1,2})?$/.test(value), "Invalid tarriff rate").optional(),
   address: z.string().min(1, "Address is required").optional(),
   theme: z.enum(["dark", "light"]),
 });
@@ -48,7 +48,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       phone_number: profile.phone_number ?? "",
       address: profile.address ?? "",
       country: profile.country ?? "",
-      tarriff_rate: profile.tarriff_rate ?? 0,
+      tarriff_rate: String(profile.tarriff_rate ? profile.tarriff_rate /100 : null) ?? "",
       theme: theme === "light" ? "light" : "dark",
     }),
     [profile, theme],
@@ -72,7 +72,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         phone_number: payload.phone_number,
         address: payload.address,
         country: payload.country,
-        tarriff_rate: payload.tarriff_rate,
+        tarriff_rate: Number(payload.tarriff_rate) * 100,
       }),
     onSuccess: (response) => {
       setProfile(response.data);
@@ -90,7 +90,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       phone_number: values.phone_number,
       address: values.address,
       country: values.country,
-      tarriff_rate: values.tarriff_rate && values.tarriff_rate * 100,
+      tarriff_rate: Number(values.tarriff_rate) / 100,
     };
     setProfile(optimisticProfile);
     setTheme(values.theme);
@@ -189,7 +189,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
       <div>
         <label className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
-          Tariff Rate
+          {"Tariff Rate (This will be resolved to your country's local currency)"}
         </label>
         <Input
           {...register("tarriff_rate")}

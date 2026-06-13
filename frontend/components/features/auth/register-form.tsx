@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,7 @@ const registerSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  confirm_password: z.string().min(8, "Password must be at least 8 characters"),
   country: z.string().min(1, "Country is required").max(60, "Country name is too long"),
 });
 
@@ -39,6 +40,7 @@ export function RegisterForm() {
       last_name: "",
       email: "",
       password: "",
+      confirm_password: "",
       country: "",
     },
     mode: "onBlur",
@@ -48,6 +50,11 @@ export function RegisterForm() {
     setFormError(null);
     try {
       // Create the account then hydrate client auth and redirect.
+      // TODO: Handle errors
+      if(values.password !== values.confirm_password) {
+        setFormError("Passwords do not match");
+        return;
+      }
       const authResponse = await registerUser(apiClient, values);
       const profile = await fetchProfile(apiClient, '');
       setSession(authResponse.accessToken, profile);
@@ -95,7 +102,7 @@ export function RegisterForm() {
       </div>
       <div className="space-y-2">
         <label className="text-sm text-slate-200" htmlFor="email">
-          Work email
+          Email
         </label>
         <Input
           id="email"
@@ -116,6 +123,19 @@ export function RegisterForm() {
           placeholder="••••••••"
           {...register("password")}
           error={errors.password?.message}
+          autoComplete="new-password"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm text-slate-200" htmlFor="confirm_password">
+          Confirm Password
+        </label>
+        <Input
+          id="confirm_password"
+          type="password"
+          placeholder="••••••••"
+          {...register("confirm_password")}
+          error={errors.confirm_password?.message}
           autoComplete="new-password"
         />
       </div>

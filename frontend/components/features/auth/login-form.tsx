@@ -73,7 +73,7 @@ export function LoginForm() {
       <div className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm text-slate-200" htmlFor="email">
-            Work email
+            Email
           </label>
           <Input
             id="email"
