@@ -31,6 +31,15 @@ export class User {
   password_hash: string;
 
   @Column({ nullable: true })
+  tarriff_rate: number; // User-specific tariff rate for billing calculations in minor currency units
+
+  @Column({ nullable: true })
+  country: string; // localization and billing purposes
+
+  @Column({ nullable: true })
+  address: string; // localization and billing purposes
+
+  @Column({ nullable: true })
   refresh_token_hash: string;
 
   @Column({

@@ -13,6 +13,7 @@ import { Alert } from "@/components/ui/alert";
 import { useAuth } from "@/components/providers/auth-provider";
 import { updateProfile } from "@/lib/api/auth";
 import type { UserProfile } from "@/lib/types/auth";
+import { COUNTRIES } from "@/lib/constants";
 
 const schema = z.object({
   first_name: z.string().min(2, "First name is required"),
@@ -23,6 +24,9 @@ const schema = z.object({
     .refine((value) => !value || /^\+234\d{10}$/.test(value), {
       message: "Use Nigerian format: +234XXXXXXXXXX",
     }),
+  country: z.string().min(1, "Country is required").max(60, "Country name is too long").optional(),
+  tarriff_rate: z.number().optional(),
+  address: z.string().min(1, "Address is required").optional(),
   theme: z.enum(["dark", "light"]),
 });
 
@@ -42,6 +46,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       first_name: profile.first_name ?? "",
       last_name: profile.last_name ?? "",
       phone_number: profile.phone_number ?? "",
+      address: profile.address ?? "",
+      country: profile.country ?? "",
+      tarriff_rate: profile.tarriff_rate ?? 0,
       theme: theme === "light" ? "light" : "dark",
     }),
     [profile, theme],
@@ -63,6 +70,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         first_name: payload.first_name,
         last_name: payload.last_name,
         phone_number: payload.phone_number,
+        address: payload.address,
+        country: payload.country,
+        tarriff_rate: payload.tarriff_rate,
       }),
     onSuccess: (response) => {
       setProfile(response.data);
@@ -78,6 +88,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       first_name: values.first_name,
       last_name: values.last_name,
       phone_number: values.phone_number,
+      address: values.address,
+      country: values.country,
+      tarriff_rate: values.tarriff_rate && values.tarriff_rate * 100,
     };
     setProfile(optimisticProfile);
     setTheme(values.theme);
@@ -136,6 +149,56 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         />
         {errors.phone_number ? (
           <p className="mt-1 text-xs text-rose-300">{errors.phone_number.message}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <label className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          Country
+        </label>
+        <select
+          id="country"
+          {...register("country")}
+          disabled={isSubmitting}
+          className="flex h-10 w-full rounded-md border border-white/10 focus:bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          autoComplete="country"
+        >
+          <option value="" disabled hidden>
+            Select a country
+          </option>
+          {COUNTRIES.map((country) => (
+            <option key={country.code} value={country.name}>
+              {country.name}
+            </option>
+          ))}
+        </select>
+        {errors.country ? (
+          <p className="mt-1 text-xs text-rose-300">{errors.country.message}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <label className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          Address
+        </label>
+        <Input {...register("address")} placeholder="123 Main Street" />
+        {errors.address ? (
+          <p className="mt-1 text-xs text-rose-300">{errors.address.message}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <label className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          Tariff Rate
+        </label>
+        <Input
+          {...register("tarriff_rate")}
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+        />
+        {errors.tarriff_rate ? (
+          <p className="mt-1 text-xs text-rose-300">{errors.tarriff_rate.message}</p>
         ) : null}
       </div>
 

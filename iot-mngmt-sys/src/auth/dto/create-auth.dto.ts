@@ -31,4 +31,11 @@ export class CreateAuthDto {
   @IsNotEmpty()
   @MinLength(8)
   password: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(60)
+  country: string; // ISO 3166-1 alpha-2 country code for localization and billing purposes
 }

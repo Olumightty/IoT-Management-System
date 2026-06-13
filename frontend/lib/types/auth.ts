@@ -15,6 +15,9 @@ export interface UserProfile {
   last_name: string;
   email: string;
   role: string;
+  country?: string | null;
+  tarriff_rate?: number | null;
+  address?: string | null;
   phone_number?: string | null;
   created_at: string;
   updated_at: string;

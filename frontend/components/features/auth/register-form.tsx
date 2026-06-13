@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,12 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { useAuth } from "@/components/providers/auth-provider";
 import { fetchProfile, register as registerUser } from "@/lib/api/auth";
+import { COUNTRIES } from "@/lib/constants";
 
 const registerSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  country: z.string().min(1, "Country is required").max(60, "Country name is too long"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -37,6 +39,7 @@ export function RegisterForm() {
       last_name: "",
       email: "",
       password: "",
+      country: "",
     },
     mode: "onBlur",
   });
@@ -115,6 +118,34 @@ export function RegisterForm() {
           error={errors.password?.message}
           autoComplete="new-password"
         />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm text-slate-200" htmlFor="country">
+          Country
+        </label>
+        <select
+          id="country"
+          {...register("country")}
+          disabled={isSubmitting}
+          className="flex h-10 w-full rounded-md border border-white/10 focus:bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          autoComplete="country"
+        >
+          <option value="" disabled hidden>
+            Select a country
+          </option>
+          {COUNTRIES.map((country) => (
+            <option key={country.code} value={country.name}>
+              {country.name}
+            </option>
+          ))}
+        </select>
+        
+        {/* Render the error message if validation fails */}
+        {errors.country?.message && (
+          <p className="text-[0.8rem] font-medium text-destructive">
+            {errors.country.message as string}
+          </p>
+        )}
       </div>
       <Button
         type="submit"
