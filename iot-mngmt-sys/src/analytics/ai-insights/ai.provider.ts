@@ -69,7 +69,7 @@ export class AiProvider {
           },
           currencyCode: {
             type: `string`,
-            description: `The currency code for the cost of the appliance.`,
+            description: `The currency code based on the country.`,
           }
         },
         required: [`warnings`, `insights`, `recommendations`, `currencyCode`],
