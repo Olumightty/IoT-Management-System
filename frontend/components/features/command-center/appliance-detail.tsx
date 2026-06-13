@@ -33,7 +33,7 @@ const RANGE_MAP: Record<RangeKey, number> = {
   "30d": 30 * 24 * 60 * 60 * 1000,
 };
 
-const NIGERIAN_TARIFF = 65;
+const NIGERIAN_TARIFF = 209.6;
 const DEFAULT_GOAL_KWH = 500;
 
 function getRange(rangeKey: RangeKey) {
@@ -355,8 +355,15 @@ export function ApplianceDetail({
             projectedBill={billingProjected}
             currentUsage={billingUsage}
             goal={usageGoal}
+            currency={insights?.aiGen.currencyCode}
+            loading={insightsLoading}
           />
-          <div className="space-y-3">
+          {insightsLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+            </div>
+          ):<div className="space-y-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="text-sm font-semibold text-slate-50">Billing Summary</p>
               <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
@@ -384,7 +391,8 @@ export function ApplianceDetail({
                 Trigger when current usage exceeds 1.5x average.
               </p>
             </div>
-          </div>
+          </div>}
+          
         </div>
       </Card>
 

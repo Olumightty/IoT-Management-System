@@ -1,10 +1,13 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface BudgetProgressBarProps {
   projectedBill: number;
   currentUsage: number;
   goal: number;
   currency?: string;
+  loading?: boolean;
 }
 
 export function BudgetProgressBar({
@@ -12,6 +15,7 @@ export function BudgetProgressBar({
   currentUsage,
   goal,
   currency = "NGN",
+  loading = false,
 }: BudgetProgressBarProps) {
   const progress = goal > 0 ? Math.min((currentUsage / goal) * 100, 100) : 0;
   const barColor =
@@ -20,6 +24,13 @@ export function BudgetProgressBar({
       : progress >= 85
         ? "bg-amber-400"
         : "bg-emerald-400";
+
+  if(loading) {
+    return <div className="space-y-4">
+      <Skeleton className="h-20" />
+      <Skeleton className="h-20" />
+    </div>
+  }
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
