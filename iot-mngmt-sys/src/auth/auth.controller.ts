@@ -107,7 +107,7 @@ export class AuthController {
   @Post('mqtt/user')
   async validateMqttUser(@Body() body: { username: string; password: string }) {
     const { username, password } = body;
-    console.log('MQTT Auth attempt for username:', username);
+    // console.log('MQTT Auth attempt for username:', username);
     // For the Superuser, we can allow it to bypass device credential checks
     if (
       username === process.env.MQTT_USERNAME &&
@@ -137,12 +137,12 @@ export class AuthController {
     const { username } = body;
 
     const isServer = username === process.env.MQTT_USERNAME;
-    console.log(
-      'Superuser check for username:',
-      username,
-      'isServer:',
-      isServer,
-    );
+    // console.log(
+    //   'Superuser check for username:',
+    //   username,
+    //   'isServer:',
+    //   isServer,
+    // );
     if (!isServer) {
       throw new UnauthorizedException('Superuser Denied');
     }
@@ -153,7 +153,7 @@ export class AuthController {
   @Post('mqtt/acl')
   checkMqttAcl(@Body() body: { username: string; topic: string; acc: number }) {
     const { username, topic } = body;
-    console.log('ACL check for username:', username, 'topic:', topic);
+    // console.log('ACL check for username:', username, 'topic:', topic);
     // Logic: Ensure the topic starts with the device's own ID
     // Example topic: energy/dev-uuid-123/fridge/telemetry
     if (topic.includes(username)) {
