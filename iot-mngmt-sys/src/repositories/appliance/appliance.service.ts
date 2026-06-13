@@ -26,6 +26,15 @@ export class ApplianceService {
     });
   }
 
+  async findOneWithUser(
+    where: FindOptionsWhere<Appliance>,
+  ): Promise<Appliance | null> {
+    return this.applianceRepository.findOne({
+      where,
+      relations: ['iot_device.user'],
+    });
+  }
+
   async findMany(where: Partial<Appliance>): Promise<Appliance[] | null> {
     return this.applianceRepository.find({ where });
   }

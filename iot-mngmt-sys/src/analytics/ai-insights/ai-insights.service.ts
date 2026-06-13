@@ -14,7 +14,7 @@ export class AiInsightsService {
   ) {}
 
   async generateReport(data: GetAnalyticsDto) {
-    const appliance = await this.applianceService.findOne({
+    const appliance = await this.applianceService.findOneWithUser({
       label: data.appliance,
       iot_device_id: data.deviceId,
     });
@@ -45,7 +45,7 @@ export class AiInsightsService {
       avgPower,
       maxTemp,
     );
-    const billing = this.getBillingReport(results);
+    const billing = this.getBillingReport(results, appliance.iot_device.user.tarriff_rate); // get user custom tarriff
 
     return {
       summary: {
@@ -109,7 +109,7 @@ export class AiInsightsService {
     };
   }
 
-  getBillingReport(data: Analytics[]) {
+  getBillingReport(data: Analytics[], tariff?: number | null) {
     // 1. Calculate Total Energy (kWh)
     // Formula: (Average Power in Watts * Time in Hours) / 1000
     let totalKwh = 0;
@@ -120,7 +120,7 @@ export class AiInsightsService {
     }
 
     // 2. Financial Mapping (Using current Nigerian Band A rates as an example)
-    const TARIFF = 209.5;
+    const TARIFF = tariff ? tariff/100 : 209.5;
     const costConsumed = totalKwh * TARIFF;
 
     // 3. Pro-rata Forecasting
