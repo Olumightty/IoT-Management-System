@@ -56,6 +56,7 @@ export interface InsightAiGen {
   warnings: InsightWarning[];
   insights: string[];
   recommendations: string[];
+  currencyCode?: string;
 }
 
 export interface InsightReport {

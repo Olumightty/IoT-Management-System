@@ -68,8 +68,8 @@ function formatWarningLabel(warning: InsightWarning) {
   return `${warning.type ?? "Alert"} · ${severity}`;
 }
 
-function formatNaira(value: number) {
-  return `NGN ${value.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
+function formatAmount(value: number, currencyCode = "NGN") {
+  return `${currencyCode} ${value.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
 }
 
 export function ApplianceDetail({
@@ -363,18 +363,18 @@ export function ApplianceDetail({
                 {billing ? (
                   <>
                     {billing.unitsConsumed.toFixed(2)} kWh used ·{" "}
-                    {formatNaira(billing.costofUnitsConsumed)} spent
+                    {formatAmount(billing.costofUnitsConsumed, insights?.aiGen.currencyCode)} spent
                   </>
                 ) : (
                   <>
-                    Avg power {averagePower.toFixed(2)} W · Tariff {NIGERIAN_TARIFF} NGN/kWh
+                    Avg power {averagePower.toFixed(2)} W · Tariff {NIGERIAN_TARIFF} {insights?.aiGen.currencyCode || "NGN"}/kWh
                   </>
                 )}
               </p>
               {billing ? (
                 <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
                   Forecast: {billing.monthlyForcastedUnitConsumed.toFixed(1)} kWh ·{" "}
-                  {formatNaira(billing.monthlyForcatedCostofUnitsConsumed)} / month
+                  {formatAmount(billing.monthlyForcatedCostofUnitsConsumed, insights?.aiGen.currencyCode)} / month
                 </p>
               ) : null}
             </div>
@@ -481,7 +481,7 @@ export function ApplianceDetail({
                     Cost So Far
                   </p>
                   <p className="mt-2 text-lg font-semibold text-slate-50">
-                    {formatNaira(billing.costofUnitsConsumed)}
+                    {formatAmount(billing.costofUnitsConsumed, insights?.aiGen.currencyCode)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -494,10 +494,10 @@ export function ApplianceDetail({
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
-                    Monthly Forecast (NGN)
+                    Monthly Forecast ({insights?.aiGen.currencyCode || "NGN"})
                   </p>
                   <p className="mt-2 text-lg font-semibold text-slate-50">
-                    {formatNaira(billing.monthlyForcatedCostofUnitsConsumed)}
+                    {formatAmount(billing.monthlyForcatedCostofUnitsConsumed, insights?.aiGen.currencyCode)}
                   </p>
                 </div>
               </div>
