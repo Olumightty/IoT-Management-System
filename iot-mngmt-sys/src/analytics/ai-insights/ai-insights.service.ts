@@ -44,6 +44,7 @@ export class AiInsightsService {
       results,
       avgPower,
       maxTemp,
+      appliance.iot_device.user.country,
     );
     const billing = this.getBillingReport(results, appliance.iot_device.user.tarriff_rate); // get user custom tarriff
 
@@ -83,10 +84,12 @@ export class AiInsightsService {
     data: Analytics[],
     avgPower: number,
     maxTemp: number,
+    country?: string,
   ): Promise<{
     warnings: { type: string; severity: string; message: string }[];
     insights: string[];
     recommendations: string[];
+    currencyCode?: string;
   }> {
     // Simulated AI function call response
     const aiResponse = await this.aiProvider.generateResponse({
@@ -94,6 +97,7 @@ export class AiInsightsService {
       telemetry: data,
       avgPower,
       maxTemp,
+      country: country ?? 'Nigeria',
     });
     if (typeof aiResponse === 'string') {
       return {
@@ -106,6 +110,7 @@ export class AiInsightsService {
       warnings: aiResponse[0].args.warnings,
       insights: aiResponse[0].args.insights,
       recommendations: aiResponse[0].args.recommendations,
+      currencyCode: aiResponse[0].args.currencyCode,
     };
   }
 

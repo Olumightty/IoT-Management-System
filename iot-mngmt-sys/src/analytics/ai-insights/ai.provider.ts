@@ -67,8 +67,12 @@ export class AiProvider {
             items: { type: `string` },
             description: `Actionable steps to improve safety or reduce costs.`,
           },
+          currencyCode: {
+            type: `string`,
+            description: `The currency code for the cost of the appliance.`,
+          }
         },
-        required: [`warnings`, `insights`, `recommendations`],
+        required: [`warnings`, `insights`, `recommendations`, `currencyCode`],
         additionalProperties: false,
       },
       strict: false,
@@ -79,6 +83,7 @@ export class AiProvider {
     telemetry: Analytics[];
     avgPower: number;
     maxTemp: number;
+    country: string;
   }) {
     try {
       const response = await this.client.responses.create({
@@ -97,6 +102,7 @@ export class AiProvider {
                   Average Power: ${data.avgPower}
                   Max Temperature: ${data.maxTemp}
                   Telemetry Log: ${JSON.stringify(data.telemetry)}
+                  Country: ${data.country}
                 `.trim(),
               },
             ],
@@ -118,6 +124,7 @@ export class AiProvider {
                 warnings: { type: string; severity: string; message: string }[];
                 insights: string[];
                 recommendations: string[];
+                currencyCode: string;
               },
             };
           });
