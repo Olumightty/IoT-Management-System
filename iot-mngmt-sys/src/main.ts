@@ -33,10 +33,11 @@ async function bootstrap() {
     },
   });
   const config = new DocumentBuilder()
-    .setTitle('IoT Management System')
-    .setDescription('The IoT Management System API description')
+    .setTitle('Ingress - IoT Energy Management System')
+    .setDescription('Ingress IoT API description')
     .setVersion('1.0')
     .addTag('iot')
+    .addTag('energy')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

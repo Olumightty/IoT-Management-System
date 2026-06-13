@@ -165,7 +165,7 @@ export function ApplianceDetail({
   const latestCurrentDraw =
     liveData?.deviceId === device.id && liveData?.appliance === appliance.label
       ? liveData.current
-      : metrics[metrics.length - 1]?.current;
+      : null; //metrics[metrics.length - 1]?.current;
   const appliancePowerState =
     latestCurrentDraw && latestCurrentDraw > 0 ? "On" : "Off";
 
